@@ -221,14 +221,14 @@ function generateLabyrinth() {
   if (!damageMap[key]) damageMap[key] = 0;
   damageMap[key]++;
 
-  // changer la couleur selon les coups
-  if (damageMap[key] === 1) labyrinth[y][x] = 4; // 1er coup -> noir
-  else if (damageMap[key] === 2) labyrinth[y][x] = 5; // 2e coup -> orange
-  else if (damageMap[key] === 3) {
-    labyrinth[y][x] = 2; // mur cassé, fond
+  // changer le tile selon les coups
+  if (damageMap[key] === 1) labyrinth[y][x] = 4;       // 1er coup → noir
+  else if (damageMap[key] === 2) labyrinth[y][x] = 5;  // 2e coup → orange
+  else if (damageMap[key] >= WALL_HITS_REQUIRED) {
+    labyrinth[y][x] = 2; // mur cassé → fond
     delete damageMap[key];
-    
-    // ajouter effet visuel
+
+    // effet visuel (optionnel)
     effects.push({x, y, duration: 10, color: '#fff'});
   }
 }
@@ -285,43 +285,35 @@ function drawLabyrinth() {
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const t = labyrinth[r][c];
-      const key = `${c},${r}`;
-      const hits = damageMap[key] || 0;
 
-      if (t === 1) { // mur normal
+      if (t === 1) {          // mur normal
         ctx.fillStyle = '#800000';
-        ctx.fillRect(c * scale, r * scale, scale, scale);
-
-      } else if (t === 3) { // mur cassable initial
+        ctx.fillRect(c*scale, r*scale, scale, scale);
+      } 
+      else if (t === 3) {     // mur cassable initial
         ctx.fillStyle = '#aa6600';
-        ctx.fillRect(c * scale, r * scale, scale, scale);
-
-        // on peut dessiner la grenouille dessus si tu veux
-        if (imgGrenouille.complete) {
-          ctx.drawImage(imgGrenouille, c * scale + scale * 0.1, r * scale + scale * 0.1, scale * 0.8, scale * 0.8);
-        }
-
-      } else if (t === 4) { // 1er coup
+        ctx.fillRect(c*scale, r*scale, scale, scale);
+      } 
+      else if (t === 4) {     // 1er coup
         ctx.fillStyle = '#000';
-        ctx.fillRect(c * scale, r * scale, scale, scale);
-
-      } else if (t === 5) { // 2e coup
+        ctx.fillRect(c*scale, r*scale, scale, scale);
+      } 
+      else if (t === 5) {     // 2e coup
         ctx.fillStyle = 'orange';
-        ctx.fillRect(c * scale, r * scale, scale, scale);
-
-      } else if (t === 0) { // grenouille
+        ctx.fillRect(c*scale, r*scale, scale, scale);
+      } 
+      else if (t === 0) {     // grenouille
         if (imgGrenouille.complete) {
-          ctx.drawImage(imgGrenouille, c * scale + scale * 0.1, r * scale + scale * 0.1, scale * 0.8, scale * 0.8);
+          ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
         }
-      } else if (t === 2) { // vide
-        ctx.fillStyle = '#ccc'; // couleur du fond
-        ctx.fillRect(c * scale, r * scale, scale, scale);
+      } 
+      else if (t === 2) {     // vide / fond
+        ctx.fillStyle = '#ccc';
+        ctx.fillRect(c*scale, r*scale, scale, scale);
       }
     }
   }
 }
-
-  
 
 function drawPlayer() {
   if (imgRenard.complete) {
@@ -539,16 +531,13 @@ function handleKeyDown(e) {
 
   if (tile === 1) return; // mur classique : bloqué
 
-  if (tile === 3) { // mur cassable
-    const key = `${nx},${ny}`;
-    damageMap[key] = (damageMap[key] || 0) + 1;
-    if (damageMap[key] >= WALL_HITS_REQUIRED) {
-      labyrinth[ny][nx] = 2; // le mur disparaît
-      delete damageMap[key];
-    }
+  if (tile === 3 || tile === 4 || tile === 5) { // mur cassable
+    hitWall(nx, ny); 
+    // Bloque le joueur jusqu'à ce que le mur soit détruit
+    if (labyrinth[ny][nx] !== 2) return;
   }
 
-  // déplacement du joueur
+  // Déplacement du joueur autorisé
   player.x = nx;
   player.y = ny;
   player.moving = true;

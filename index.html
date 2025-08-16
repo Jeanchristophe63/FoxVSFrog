@@ -133,6 +133,7 @@ const timerEl = document.getElementById('timer');
 const startBtn = document.getElementById('startBtn');
 const scaleInput = document.getElementById('scale');
 const ghostCountSel = document.getElementById('ghostCount');
+const WALL_HITS_REQUIRED = 3; // nombre de coups nécessaires pour casser un mur
 
 let scale = parseInt(scaleInput.value);
 let labyrinth = [];
@@ -170,7 +171,7 @@ function resizeCanvas() {
 function canMove(x, y) {
   if (!labyrinth[y] || labyrinth[y][x] == null) return false;
   const t = labyrinth[y][x];
-  return (t !== 1 && t !== 3);
+  return (t !== 1); // les murs classiques bloquent, mais pas les murs cassables
 }
 
 function updateScore() {
@@ -491,21 +492,26 @@ function handleKeyDown(e) {
   else if (e.key === 'ArrowDown') ny++;
   else return;
 
-  // Mur cassable
-  if (labyrinth[ny] && labyrinth[ny][nx] === 3) {
-    labyrinth[ny][nx] = 0; // casse le mur
-    player.x = nx; player.y = ny;
-    player.moving = true;
-    player.dir = e.key.replace('Arrow','').toLowerCase();
-    return;
+  if (!labyrinth[ny] || labyrinth[ny][nx] == null) return;
+
+  const tile = labyrinth[ny][nx];
+
+  if (tile === 1) return; // mur classique : bloqué
+
+  if (tile === 3) { // mur cassable
+    const key = `${nx},${ny}`;
+    damageMap[key] = (damageMap[key] || 0) + 1;
+    if (damageMap[key] >= WALL_HITS_REQUIRED) {
+      labyrinth[ny][nx] = 2; // le mur disparaît
+      delete damageMap[key];
+    }
   }
 
-  // Mur solide ou sortie
-  if (canMove(nx, ny)) {
-    player.x = nx; player.y = ny;
-    player.moving = true;
-    player.dir = e.key.replace('Arrow','').toLowerCase();
-  }
+  // déplacement du joueur
+  player.x = nx;
+  player.y = ny;
+  player.moving = true;
+  player.dir = e.key.replace('Arrow','').toLowerCase();
 }
 
 function startGame() {

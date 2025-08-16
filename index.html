@@ -282,35 +282,45 @@ function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
    DESSIN
    ======================= */
 function drawLabyrinth() {
-  for (let r=0; r<rows; r++) {
-    for (let c=0; c<cols; c++) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       const t = labyrinth[r][c];
-      if (t === 1) { // mur
-        ctx.fillStyle = '#800000';
-        ctx.fillRect(c*scale, r*scale, scale, scale);
-      } else if (t === 3) { // mur cassable (si tu l'actives un jour)
-        ctx.fillStyle = '#aa6600';
-        ctx.fillRect(c*scale, r*scale, scale, scale);
-      } else if (t === 0) { // grenouille
-        if (imgGrenouille.complete) {
-          ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
-      } else if (t === 3) { // mur cassable
       const key = `${c},${r}`;
       const hits = damageMap[key] || 0;
+
+      if (t === 1) { // mur normal
+        ctx.fillStyle = '#800000';
+        ctx.fillRect(c * scale, r * scale, scale, scale);
+
+      } else if (t === 3) { // mur cassable initial
+        ctx.fillStyle = '#aa6600';
+        ctx.fillRect(c * scale, r * scale, scale, scale);
+
+        // on peut dessiner la grenouille dessus si tu veux
         if (imgGrenouille.complete) {
-       // On dessine la grenouille sur le mur cassable
-          ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
-          if (t === 1) ctx.fillStyle = '#800000';      // mur normal
-else if (t === 3) ctx.fillStyle = '#aa6600'; // mur cassable initial
-else if (t === 4) ctx.fillStyle = '#000';    // 1er coup
-else if (t === 5) ctx.fillStyle = 'orange';  // 2e coup
-else if (t === 0) { ... } // grenouille
-  }
-}
+          ctx.drawImage(imgGrenouille, c * scale + scale * 0.1, r * scale + scale * 0.1, scale * 0.8, scale * 0.8);
         }
+
+      } else if (t === 4) { // 1er coup
+        ctx.fillStyle = '#000';
+        ctx.fillRect(c * scale, r * scale, scale, scale);
+
+      } else if (t === 5) { // 2e coup
+        ctx.fillStyle = 'orange';
+        ctx.fillRect(c * scale, r * scale, scale, scale);
+
+      } else if (t === 0) { // grenouille
+        if (imgGrenouille.complete) {
+          ctx.drawImage(imgGrenouille, c * scale + scale * 0.1, r * scale + scale * 0.1, scale * 0.8, scale * 0.8);
+        }
+      } else if (t === 2) { // vide
+        ctx.fillStyle = '#ccc'; // couleur du fond
+        ctx.fillRect(c * scale, r * scale, scale, scale);
       }
     }
   }
+}
+
   
 
 function drawPlayer() {

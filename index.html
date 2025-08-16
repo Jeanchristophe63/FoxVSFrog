@@ -276,19 +276,18 @@ function drawLabyrinth() {
       } else if (t === 0) { // grenouille
         if (imgGrenouille.complete) {
           ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
-          else if (t === 3) { // mur cassable
-  const key = `${c},${r}`;
-  const hits = damageMap[key] || 0;
-  if (imgGrenouille.complete) {
-    // On dessine la grenouille sur le mur cassable
-    ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
+      } else if (t === 3) { // mur cassable
+      const key = `${c},${r}`;
+      const hits = damageMap[key] || 0;
+        if (imgGrenouille.complete) {
+       // On dessine la grenouille sur le mur cassable
+          ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
   }
 }
         }
       }
     }
   }
-}
 
 function drawPlayer() {
   if (imgRenard.complete) {

@@ -44,8 +44,9 @@ const PLAYER_SPEED     = 40;   // px par frame (joueur)
 const GHOST_SPEED      = 6;    // px par frame (fantômes)
 const FROG_SPAWN_RATE  = 99;   // % de cases libres qui contiennent une grenouille (0–100)
 const LEVEL_TIME       = 90;  // secondes par labyrinthe
-const DEFAULT_NUM_GHOSTS = 2;  // nombre par défaut (sera écrasé par le sélecteur UI)
-
+const DEFAULT_NUM_GHOSTS = 3;  // nombre par défaut (sera écrasé par le sélecteur UI)
+const WALL_HITS_REQUIRED = 3; // nombre de coups nécessaires pour casser un mur
+  
 /* =======================
    LABYRINTHES (15 x 14)
    1 = mur, 0 = chemin (grenouille potentielle), 2 = vide, 3 = mur cassable (optionnel)
@@ -133,7 +134,7 @@ const timerEl = document.getElementById('timer');
 const startBtn = document.getElementById('startBtn');
 const scaleInput = document.getElementById('scale');
 const ghostCountSel = document.getElementById('ghostCount');
-const WALL_HITS_REQUIRED = 2; // nombre de coups nécessaires pour casser un mur
+
 
 let scale = parseInt(scaleInput.value);
 let labyrinth = [];
@@ -215,6 +216,23 @@ function generateLabyrinth() {
   generateGhosts();
 }
 
+  function hitWall(x, y) {
+  const key = `${x},${y}`;
+  if (!damageMap[key]) damageMap[key] = 0;
+  damageMap[key]++;
+
+  // changer la couleur selon les coups
+  if (damageMap[key] === 1) labyrinth[y][x] = 4; // 1er coup -> noir
+  else if (damageMap[key] === 2) labyrinth[y][x] = 5; // 2e coup -> orange
+  else if (damageMap[key] === 3) {
+    labyrinth[y][x] = 2; // mur cassé, fond
+    delete damageMap[key];
+    
+    // ajouter effet visuel
+    effects.push({x, y, duration: 10, color: '#fff'});
+  }
+}
+
 function resetPlayer() {
   player.x = 1; player.y = 1;
   player.xPos = player.x * scale;
@@ -282,12 +300,18 @@ function drawLabyrinth() {
         if (imgGrenouille.complete) {
        // On dessine la grenouille sur le mur cassable
           ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
+          if (t === 1) ctx.fillStyle = '#800000';      // mur normal
+else if (t === 3) ctx.fillStyle = '#aa6600'; // mur cassable initial
+else if (t === 4) ctx.fillStyle = '#000';    // 1er coup
+else if (t === 5) ctx.fillStyle = 'orange';  // 2e coup
+else if (t === 0) { ... } // grenouille
   }
 }
         }
       }
     }
   }
+  
 
 function drawPlayer() {
   if (imgRenard.complete) {

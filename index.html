@@ -491,6 +491,16 @@ function handleKeyDown(e) {
   else if (e.key === 'ArrowDown') ny++;
   else return;
 
+  // Mur cassable
+  if (labyrinth[ny] && labyrinth[ny][nx] === 3) {
+    labyrinth[ny][nx] = 0; // casse le mur
+    player.x = nx; player.y = ny;
+    player.moving = true;
+    player.dir = e.key.replace('Arrow','').toLowerCase();
+    return;
+  }
+
+  // Mur solide ou sortie
   if (canMove(nx, ny)) {
     player.x = nx; player.y = ny;
     player.moving = true;

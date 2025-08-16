@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Pacman Renard — 4 labyrinthes + timer + choix fantômes</title>
+<title>Pacman Renard — 4 labyrinthes</title>
 <style>
   body { background:#000; margin:0; font-family:monospace; color:#fff; text-align:center; user-select:none; }
   #game-container { display:inline-block; position:relative; }
@@ -19,7 +19,7 @@
 <!-- Contrôles -->
 <div id="controls">
   <label for="scale">Zoom :</label>
-  <input type="number" id="scale" value="50" min="16" max="64" step="4" />
+  <input type="number" id="scale" value="48" min="16" max="64" step="4" /> // Value = Zoom par defaut
   <label for="ghostCount">Fantômes (2–5) :</label>
   <select id="ghostCount">
     <option value="2">2</option>
@@ -133,7 +133,7 @@ const timerEl = document.getElementById('timer');
 const startBtn = document.getElementById('startBtn');
 const scaleInput = document.getElementById('scale');
 const ghostCountSel = document.getElementById('ghostCount');
-const WALL_HITS_REQUIRED = 3; // nombre de coups nécessaires pour casser un mur
+const WALL_HITS_REQUIRED = 2; // nombre de coups nécessaires pour casser un mur
 
 let scale = parseInt(scaleInput.value);
 let labyrinth = [];
@@ -276,6 +276,14 @@ function drawLabyrinth() {
       } else if (t === 0) { // grenouille
         if (imgGrenouille.complete) {
           ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
+          else if (t === 3) { // mur cassable
+  const key = `${c},${r}`;
+  const hits = damageMap[key] || 0;
+  if (imgGrenouille.complete) {
+    // On dessine la grenouille sur le mur cassable
+    ctx.drawImage(imgGrenouille, c*scale + scale*0.1, r*scale + scale*0.1, scale*0.8, scale*0.8);
+  }
+}
         }
       }
     }

@@ -292,11 +292,11 @@ function drawLabyrinth() {
         ctx.fillRect(c*scale, r*scale, scale, scale);
       } 
       else if (t === 3) {     // mur cassable initial
-        ctx.fillStyle = '#aa6600';
+        ctx.fillStyle = '#000';
         ctx.fillRect(c*scale, r*scale, scale, scale);
       } 
       else if (t === 4) {     // 1er coup
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = 'red';
         ctx.fillRect(c*scale, r*scale, scale, scale);
       } 
       else if (t === 5) {     // 2e coup
